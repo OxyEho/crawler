@@ -36,4 +36,4 @@ class Parser(object):
                 info = info + description
             if title is not None:
                 info = info + title.group(1).split()
-        return list(set(info))
+        return set(word.strip().lower() for word in info)
