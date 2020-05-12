@@ -10,7 +10,7 @@ class TestsCrawler(unittest.TestCase):
             with patch.object(Crawler, 'write_html') as mock_write_html:
                 mock_write_html.return_value = None
                 test_crawler = Crawler('https://docs.scala-lang.org/ru/tour/tour-of-scala.html', ['psina'], {})
-                test_result = test_crawler.searcher()
+                test_result = test_crawler.crawl()
                 self.assertEqual(test_result, set())
 
     def test_searcher_with_result(self):
@@ -29,8 +29,8 @@ class TestsCrawler(unittest.TestCase):
             with patch.object(Crawler, 'write_html') as mock_write_html:
                 mock_write_html.return_value = None
                 test_crawler = Crawler('https://docs.scala-lang.org/ru/tour/tour-of-scala.html', ['scala'], {})
-                test_result = test_crawler.searcher()
-                self.assertEqual(len(test_result), 11)
+                test_result = test_crawler.crawl()
+                self.assertEqual(len(test_result), 10)
 
     def test_searcher_with_seen_urls(self):
         with patch.object(Crawler, 'get_html') as mock_get_html:
@@ -40,7 +40,7 @@ class TestsCrawler(unittest.TestCase):
                 mock_write_html.return_value = None
                 test_crawler = Crawler('https://docs.scala-lang.org/ru/tour/tour-of-scala.html', ['scala'], {})
                 test_crawler.seen_urls.add('http://scala-lang.org')
-                test_result = test_crawler.searcher()
+                test_result = test_crawler.crawl()
                 assert 'http://scala-lang.org' not in test_result
 
     def test_searcher_with_two_seen_urls(self):
@@ -53,7 +53,7 @@ class TestsCrawler(unittest.TestCase):
                 test_crawler = Crawler('https://docs.scala-lang.org/ru/tour/tour-of-scala.html', ['scala'], {})
                 test_crawler.seen_urls.add('http://scala-lang.org')
                 test_crawler.seen_urls.add('https://www.scala-lang.org/download/')
-                test_result = test_crawler.searcher()
+                test_result = test_crawler.crawl()
                 assert 'http://scala-lang.org' not in test_result and \
                        'https://www.scala-lang.org/download/' not in test_result
 

@@ -6,7 +6,7 @@ from crawler.parser import Parser
 
 
 class Crawler(object):
-    urls: []
+    urls: [str]
     request: [str]
     seen_urls: {str}
     max_count_urls: int
@@ -15,9 +15,8 @@ class Crawler(object):
     result_urls: {str}
 
     def __init__(self, start_url, request, white_domains, max_urls_count=10):
-        self.urls = []
+        self.urls = [start_url]
         self.result_urls = set()
-        self.urls.append(start_url)
         self.max_count_urls = max_urls_count
         self.visited_urls_count = 0
         self.request = request
@@ -28,7 +27,7 @@ class Crawler(object):
     def get_html(url):
         try:
             return requests.get(url).text
-        except requests.exceptions:
+        except (requests.exceptions.MissingSchema, requests.exceptions.ConnectionError):
             return None
 
     @staticmethod
@@ -51,7 +50,7 @@ class Crawler(object):
                     return True
         return False
 
-    def analysis_url(self, url):
+    def analyze_url(self, url):
         self.visited_urls_count += 1
         if not self.check_domains(url):
             return
@@ -68,16 +67,15 @@ class Crawler(object):
         for word in self.request:
             for control_word in info:
                 if word.lower() in control_word.lower() and url not in self.result_urls:
-                    print(url)
                     self.result_urls.add(url)
                     Crawler.write_html(url, html)
 
-    def searcher(self):
+    def crawl(self):
         while self.visited_urls_count < self.max_count_urls and len(self.urls) != 0:
             for url in self.urls:
-                thread = Thread(self.analysis_url(url))
+                thread = Thread(self.analyze_url(url))
                 thread.start()
                 self.urls.remove(url)
-                if self.visited_urls_count > self.max_count_urls:
+                if self.visited_urls_count >= self.max_count_urls:
                     return self.result_urls
         return self.result_urls

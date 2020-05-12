@@ -16,14 +16,14 @@ def main():
     white_domains = []
     for domain in args.wildcard:
         if domain.startswith('*'):
-            reg_exp_domain = f'[^.]+{domain[1::]}'
-            white_domains.append(re.compile(r'{}'.format(reg_exp_domain)))
+            white_domains.append(re.compile(fr'[^.]+{domain[1::]}'))
         else:
             white_domains.append(domain)
     crawler = Crawler(start_url, request, white_domains, max_count_urls)
-    crawler.searcher()
+    result = crawler.crawl()
+    for link in result:
+        print(link)
     print('Program is completed')
-    exit()
 
 
 if __name__ == '__main__':
