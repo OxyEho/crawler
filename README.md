@@ -30,11 +30,12 @@
     python main.py https://docs.scala-lang.org/ru/tour/tour-of-scala.html scala -d 5 --wildcard *.scala-lang.org
 
     https://docs.scala-lang.org/ru/tour/tour-of-scala.html
-    https://docs.scala-lang.org//
-    https://www.scala-lang.org/community/
-    https://www.scala-lang.org/contribute/
     https://docs.scala-lang.org//ru
-    https://www.scala-lang.org/files/archive/nightly/2.13.x/api/2.13.x/
+    https://www.scala-lang.org/community/
+    https://docs.scala-lang.org//
+    https://www.scala-lang.org/contribute/
+    Program is completed
+
 
 
 ## Запрос
