@@ -47,7 +47,9 @@ class TestsCrawler(unittest.TestCase):
         with patch.object(Crawler, 'get_html') as mock_get_html:
             mock_get_html.return_value = '<a href=http://scala-lang.org></a>' \
                                          '<a href=https://scala11.html></a>' \
-                                         '<a href=https://www.scala-lang.org/download/></a>'
+                                         '<a href=https://www.scala-lang.org/download/></a>' \
+                                         '<a href=https://scala12.html></a>' \
+                                         '<a href=https://scala13.html></a>'
             with patch.object(Crawler, 'write_html') as mock_write_html:
                 mock_write_html.return_value = None
                 test_crawler = Crawler('https://docs.scala-lang.org/ru/tour/tour-of-scala.html', ['scala'], {}, 4)
