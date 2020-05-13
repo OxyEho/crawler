@@ -28,7 +28,9 @@ class Parser(object):
 
     @staticmethod
     def get_info(html: str, url: str):
-        info = [url]
+        info = []
+        url_info = re.split(r'[\-:./\d]+', url)
+        info += url_info
         if html is not None:
             description = re.findall(Parser.description_finder, html)
             title = re.search(Parser.title_finder, html)
@@ -36,4 +38,4 @@ class Parser(object):
                 info = info + description
             if title is not None:
                 info = info + title.group(1).split()
-        return list(set(info))
+        return set(word.strip().lower() for word in info)

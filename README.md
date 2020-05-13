@@ -12,9 +12,11 @@
 
 ## Запуск 
 
-    python main.py some_start_url some_request -d 10
+    python main.py some_start_url some_request -d 10 --wildcard *.wikipedia.org -f result
 
     Опция -d задает максимальное количество просмотренных ссылок
+    
+    Опция -f указывает директорию, в которую будут скачаны найденные страницы
     
     Опция --wildcard задает домены, которые можно посещать 
     

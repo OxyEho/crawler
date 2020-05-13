@@ -9,7 +9,7 @@ class TestsCrawler(unittest.TestCase):
             mock_get_html.return_value = '<a href=https://scala1.html></a>'
             with patch.object(Crawler, 'write_html') as mock_write_html:
                 mock_write_html.return_value = None
-                test_crawler = Crawler('https://docs.scala-lang.org/ru/tour/tour-of-scala.html', ['psina'], {})
+                test_crawler = Crawler('https://docs.scala-lang.org/ru/tour/tour-of-scala.html', ['psina'], {}, 2)
                 test_result = test_crawler.crawl()
                 self.assertEqual(test_result, set())
 
@@ -38,7 +38,7 @@ class TestsCrawler(unittest.TestCase):
                                          '<a href=https://scala11.html></a>'
             with patch.object(Crawler, 'write_html') as mock_write_html:
                 mock_write_html.return_value = None
-                test_crawler = Crawler('https://docs.scala-lang.org/ru/tour/tour-of-scala.html', ['scala'], {})
+                test_crawler = Crawler('https://docs.scala-lang.org/ru/tour/tour-of-scala.html', ['scala'], {}, 2)
                 test_crawler.seen_urls.add('http://scala-lang.org')
                 test_result = test_crawler.crawl()
                 assert 'http://scala-lang.org' not in test_result
@@ -50,7 +50,7 @@ class TestsCrawler(unittest.TestCase):
                                          '<a href=https://www.scala-lang.org/download/></a>'
             with patch.object(Crawler, 'write_html') as mock_write_html:
                 mock_write_html.return_value = None
-                test_crawler = Crawler('https://docs.scala-lang.org/ru/tour/tour-of-scala.html', ['scala'], {})
+                test_crawler = Crawler('https://docs.scala-lang.org/ru/tour/tour-of-scala.html', ['scala'], {}, 4)
                 test_crawler.seen_urls.add('http://scala-lang.org')
                 test_crawler.seen_urls.add('https://www.scala-lang.org/download/')
                 test_result = test_crawler.crawl()
