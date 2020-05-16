@@ -59,6 +59,27 @@ class TestsCrawler(unittest.TestCase):
                 assert 'http://scala-lang.org' not in test_result and \
                        'https://www.scala-lang.org/download/' not in test_result
 
+    def test_searcher_with_domains(self):
+        with patch.object(Crawler, 'get_html') as mock_get_html:
+            mock_get_html.return_value = '<a href=https://scala1.html></a>' \
+                                         '<a href=https://scala2.html></a>' \
+                                         '<a href=https://scala3.html></a>' \
+                                         '<a href=https://scala4.html></a>' \
+                                         '<a href=https://scala5.html></a>' \
+                                         '<a href=https://scala6.html></a>' \
+                                         '<a href=https://scala7.html></a>' \
+                                         '<a href=https://scala8.html></a>' \
+                                         '<a href=https://scala9.html></a>' \
+                                         '<a href=https://scala10.html></a>' \
+                                         '<a href=https://scala11.html></a>' \
+                                         '<a href=https://docs.scala-lang.org/scala1.html></a>'
+            with patch.object(Crawler, 'write_html') as mock_write_html:
+                mock_write_html.return_value = None
+                test_crawler = Crawler('https://docs.scala-lang.org/ru/tour/tour-of-scala.html',
+                                       ['scala'], ['docs.scala-lang.org'])
+                test_result = test_crawler.crawl()
+                self.assertEqual(len(test_result), 2)
+
 
 if __name__ == '__main__':
     unittest.main()

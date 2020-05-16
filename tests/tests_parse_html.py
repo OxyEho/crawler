@@ -1,11 +1,15 @@
 import unittest
+from unittest.mock import patch
 from crawler.crawler import Crawler
 from crawler.parser import Parser
 
 
 class TestsHtml(unittest.TestCase):
     def test_get_html_with_no_html(self):
-        test_result = Crawler.get_html('https://vcsacsavsdsdk.com/feed')
+        with patch.object(Crawler, 'get_html') as mock_get_html:
+            mock_get_html.return_value = None
+            crawler = Crawler('https://vcsacsavsdsdk.com/feed', ['a'], {})
+            test_result = crawler.get_html('https://vcsacsavsdsdk.com/feed')
         self.assertIsNone(test_result)
 
     def test_get_url_with_not_url(self):
