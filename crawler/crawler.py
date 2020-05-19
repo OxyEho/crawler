@@ -52,24 +52,28 @@ class Crawler(object):
             return
         robots_txt = robots_txt[index::]
         robots_txt = robots_txt.split('\n')
-        for string in robots_txt:
-            if string.startswith('disallow'):
-                string = string.replace('*', '[^/]*')
-                string = string.split(': ')
-                self.disallow_urls.add(re.compile(fr"{host}{string[1]}"))
+        try:
+            for string in robots_txt:
+                if string.startswith('disallow'):
+                    string = string.replace('*', '.+')
+                    string = string.split(':')
+                    print(f'{host}{string[1][2::]}')
+                    self.disallow_urls.add(re.compile(fr"{host}{string[1][2::]}", re.IGNORECASE))
+        except IndexError:
+            pass
 
     def analyze_robot(self, url):
         lock.acquire()
         for reg_dis_url in self.disallow_urls:
             if re.search(reg_dis_url, url):
                 lock.release()
-                raise requests.exceptions.ConnectionError
+                return True
         lock.release()
+        return False
 
     def get_html(self, url):
         try:
             self.fill_disallow_urls(url)
-            self.analyze_robot(url)
             return requests.get(url).text
         except (requests.exceptions.MissingSchema, requests.exceptions.ConnectionError,
                 requests.exceptions.InvalidSchema, requests.exceptions.ContentDecodingError):
@@ -103,6 +107,9 @@ class Crawler(object):
                 return
             html = self.get_html(url)
             if html is None:
+                self.current_threads.pop(url)
+                return
+            if self.analyze_robot(url):
                 self.current_threads.pop(url)
                 return
             if self.visited_urls_count <= self.max_count_urls:

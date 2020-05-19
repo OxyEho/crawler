@@ -1,4 +1,5 @@
 import unittest
+import re
 from unittest.mock import patch
 from crawler.crawler import Crawler
 
@@ -79,6 +80,42 @@ class TestsCrawler(unittest.TestCase):
                                        ['scala'], ['docs.scala-lang.org'])
                 test_result = test_crawler.crawl()
                 self.assertEqual(len(test_result), 2)
+
+    def test_searcher_with_disallow_url(self):
+        with patch.object(Crawler, 'get_html') as mock_get_html:
+            mock_get_html.return_value = '<a href=https://scala1.html></a>' \
+                                         '<a href=https://scala2.html></a>' \
+                                         '<a href=https://scala3.html></a>' \
+                                         '<a href=https://scala4.html></a>' \
+                                         '<a href=https://scala5.html></a>' \
+                                         '<a href=https://scala6.html></a>' \
+                                         '<a href=https://scala7.html></a>' \
+                                         '<a href=https://scala8.html></a>' \
+                                         '<a href=https://scala9.html></a>'
+            with patch.object(Crawler, 'write_html') as mock_write_html:
+                mock_write_html.return_value = None
+                test_crawler = Crawler('https://docs.scala-lang.org/ru/tour/tour-of-scala.html', ['scala'], {})
+                test_crawler.disallow_urls.add(re.compile(r'https://scala5.html'))
+                test_result = test_crawler.crawl()
+                self.assertEqual(len(test_result), 9)
+
+    def test_searcher_with_disallow_urls(self):
+        with patch.object(Crawler, 'get_html') as mock_get_html:
+            mock_get_html.return_value = '<a href=https://scala1.html></a>' \
+                                         '<a href=https://scala2.html></a>' \
+                                         '<a href=https://scala3.html></a>' \
+                                         '<a href=https://scala4.html></a>' \
+                                         '<a href=https://scala5.html></a>' \
+                                         '<a href=https://scala6.html></a>' \
+                                         '<a href=https://scala7.html></a>' \
+                                         '<a href=https://scala8.html></a>' \
+                                         '<a href=https://scala9.html></a>'
+            with patch.object(Crawler, 'write_html') as mock_write_html:
+                mock_write_html.return_value = None
+                test_crawler = Crawler('https://docs.scala-lang.org/ru/tour/tour-of-scala.html', ['scala'], {})
+                test_crawler.disallow_urls.add(re.compile(r'https://scala.*.html'))
+                test_result = test_crawler.crawl()
+                self.assertEqual(len(test_result), 1)
 
 
 if __name__ == '__main__':
