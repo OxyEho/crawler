@@ -129,6 +129,8 @@ class Crawler(object):
 
     def crawl(self):
         while self.visited_urls_count < self.max_count_urls:
+            if not self.current_threads and self.urls.empty():
+                break
             if len(self.current_threads) < self.max_count_urls:
                 try:
                     url = self.urls.get(timeout=3)
