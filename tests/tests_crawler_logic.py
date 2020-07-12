@@ -113,7 +113,7 @@ class TestsCrawler(unittest.TestCase):
             with patch.object(Crawler, 'write_html') as mock_write_html:
                 mock_write_html.return_value = None
                 test_crawler = Crawler('https://docs.scala-lang.org/ru/tour/tour-of-scala.html', ['scala'], {})
-                test_crawler.disallow_urls.add(re.compile(r'https://scala.*.html'))
+                test_crawler.disallow_urls.add(re.compile(r'https://scala.*?.html'))
                 test_result = test_crawler.crawl()
                 self.assertEqual(len(test_result), 1)
 

@@ -22,7 +22,7 @@ def main():
     #     else:
     #         white_domains.append(domain)
     # crawler = Crawler(start_url, request, white_domains, max_count_urls, directory_for_download)
-    crawler = Crawler('https://habr.com/ru/top/', [''], {}, 10, 'log')
+    crawler = Crawler('https://habr.com/ru/top/', [''], {}, 3, 'log')
     result = crawler.crawl()
     for link in result:
         print(link)
