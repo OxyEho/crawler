@@ -12,17 +12,17 @@ lock = Lock()
 
 
 class Page:
-    def __init__(self, url: str, parent=None):
+    def __init__(self, url: str, parent=None, origin_directory = 'log'):
         self.url = url
         self.parent = parent
-        self.children_directory = re.sub(r'[\\/?:*"><]', '_', url) + '_children'
-
-    def get_all_path(self, path):
-        page = self
-        while page.parent is not None:
-            path = os.path.join(path, page.parent.children_directory)
-            page = page.parent
-        return path
+        if parent:
+            self.children_directory = os.path.join(
+                parent.children_directory,
+                re.sub(r'[\\/?:*"><]', '_', url) + '_children')
+        else:
+            self.children_directory = os.path.join(
+                origin_directory,
+                re.sub(r'[\\/?:*"><]', '_', url) + '_children')
 
 
 class Crawler(object):
@@ -40,7 +40,7 @@ class Crawler(object):
 
     def __init__(self, start_url, request, white_domains, max_urls_count=10, directory_for_download='log'):
         self.urls = Queue()
-        self.urls.put(Page(start_url))
+        self.urls.put(Page(start_url, origin_directory=directory_for_download))
         self.result_urls = set()
         self.max_count_urls = max_urls_count
         self.visited_urls_count = 0
@@ -95,15 +95,15 @@ class Crawler(object):
     def write_html(self, page: Page, html: str):
         reg_exp = re.compile(r'[\\/?:*"><]')
         name = re.sub(reg_exp, '_', page.url)
-        # os.makedirs(self.directory_for_download, exist_ok=True)
-        # if page.parent is not None:
-        #     page_path = page.get_all_path(self.directory_for_download)
-        #     os.makedirs(page_path, exist_ok=True)
-        #     with open(f'{page_path}/{name}.html', 'w', encoding='utf-8') as writing:
-        #         writing.write(html)
-        # else:
-        #     with open(f'{self.directory_for_download}/{name}.html', 'w', encoding='utf-8') as writing:
-        #         writing.write(html)
+        os.makedirs(self.directory_for_download, exist_ok=True)
+        if page.parent is not None:
+            page_path = page.parent.children_directory
+            os.makedirs(page_path, exist_ok=True)
+            with open(f'{page_path}/{name}.html', 'w', encoding='utf-8') as writing:
+                writing.write(html)
+        else:
+            with open(f'{self.directory_for_download}/{name}.html', 'w', encoding='utf-8') as writing:
+                writing.write(html)
 
     def check_domains(self, url: str):
         if len(self.white_domains) == 0:
@@ -141,7 +141,6 @@ class Crawler(object):
                 found_links = set(parser.get_urls(html))
                 for link in found_links.difference(self.seen_urls):
                     self.urls.put(Page(link, parent=page))
-                page.children_directory = re.sub(r'[\\/?:*"><]', '_', page.url) + '_children'
             else:
                 return
         finally:
