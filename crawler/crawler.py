@@ -71,7 +71,9 @@ class Crawler(object):
                 if string.startswith('disallow'):
                     string = string.replace('*', '.+')
                     string = string.split(':')
+                    lock.acquire()
                     self.disallow_urls.add(re.compile(fr"{host}{string[1][2::]}", re.IGNORECASE))
+                    lock.release()
         except IndexError:
             pass
 
@@ -136,7 +138,7 @@ class Crawler(object):
                 parser = Parser(page.url)
                 info = parser.get_info(html, page.url)
                 if len(self.request.intersection(info)) != 0 and page.url not in self.result_urls:
-                    self.result_urls.add(page.url)
+                    self.result_urls.add(page)
                     self.write_html(page, html)
                 found_links = set(parser.get_urls(html))
                 for link in found_links.difference(self.seen_urls):

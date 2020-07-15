@@ -1,3 +1,6 @@
+matplotlib
+numpy
+networkx
 coverage==5.1
 requests
 beautifulsoup4
