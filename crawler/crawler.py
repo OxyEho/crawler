@@ -141,11 +141,11 @@ class Crawler(object):
                     self.result_urls.add(page)
                     self.write_html(page, html)
                 found_links = set(parser.get_urls(html))
-                i = 0
+                max_count_from_page = 0
                 for link in found_links.difference(self.seen_urls):
                     self.urls.put(Page(link, parent=page))
-                    i += 1
-                    if i == 10:
+                    max_count_from_page += 1
+                    if max_count_from_page == 10:
                         break
             else:
                 return
