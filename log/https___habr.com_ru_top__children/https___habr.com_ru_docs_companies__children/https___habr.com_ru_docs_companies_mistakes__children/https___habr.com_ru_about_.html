@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ru" class="no-js">
+  <head>
+    <title>Хабр. Сообщество IT-специалистов</title>
+    <meta itemprop="name" content="Хабр. Сообщество IT-специалистов">
+    <meta property="og:title" content="Хабр. Сообщество IT-специалистов">
+    <meta name="twitter:title" content="Хабр. Сообщество IT-специалистов">
+    <meta name="description" content="На Хабре интересно всем, для кого IT — это не просто две буквы алфавита">
+    <meta itemprop="description" content="На Хабре интересно всем, для кого IT — это не просто две буквы алфавита">
+    <meta property="og:description" content="На Хабре интересно всем, для кого IT — это не просто две буквы алфавита">
+    <meta name="twitter:description" content="На Хабре интересно всем, для кого IT — это не просто две буквы алфавита">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta content='width=1024' name='viewport'>
+<meta name="apple-mobile-web-app-status-bar-style" content="#77a2b6">
+<meta name="application-name" content="habr">
+<meta name="msapplication-TileColor" content="#77a2b6">
+<meta name="theme-color" content="#77a2b6">
+<meta property="fb:app_id" content="444736788986613">
+<meta property="fb:pages" content="472597926099084">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@habrahabr">
+<meta property="og:type" content="article">
+<meta property="og:image" content="/images/habr-about.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="628" />
+<link rel="image_src" href="/images/habr-about.png" />
+
+<link rel="apple-touch-icon" sizes="180x180" href="https://dr.habracdn.net/habr/5f60e105/images/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://dr.habracdn.net/habr/5f60e105/images/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="https://dr.habracdn.net/habr/5f60e105/images/favicon-16x16.png">
+<link rel="manifest" href="https://dr.habracdn.net/habr/5f60e105/site.webmanifest">
+<link rel="mask-icon" href="https://dr.habracdn.net/habr/5f60e105/images/safari-pinned-tab.svg" color="#77a2b6">
+<meta name="application-name" content="Хабр"/>
+<meta name="msapplication-TileColor" content="#77a2b6">
+<meta name="theme-color" content="#77a2b6">
+
+<script type="text/javascript">
+  function stripUrl(currentUrl, queryParam) {
+   return currentUrl.replace(/\?([^#]*)/, function(_, search) {
+      var result = search.split('&').map(function(param) {
+        var regexp = new RegExp(`^${queryParam}`);
+        if (regexp.test(param)) {
+          return '';
+        }
+        return param;
+      }).filter(Boolean).join('&');
+      return result ? '?' + result : '';
+    });
+  }
+
+  (function() {
+    if (location.search.indexOf('cv') != -1 && history.replaceState) {
+      var currentUrl = location.toString();
+      var strippedUrl = stripUrl(currentUrl, 'cv');
+      history.replaceState({}, '', strippedUrl);
+    }
+  })();
+
+  function callGA(usesABP) {
+    if (typeof window.adb1 === 'undefined') { window.adb1 = 'yes';}
+    if (usesABP) { window.adb1 = 'aa'; }
+
+    var user_type = 'guest';
+
+    var page_type = "other";
+
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-726094-1',  'auto');
+        ga('create', 'UA-726094-24', 'auto', {'name': 'HGM', 'allowLinker': true});
+
+    ga('HGM.require', 'linker');
+    ga('HGM.linker:autoLink', ['toster.ru', 'habr.com', 'account.habr.com', 'm.habr.com']);
+
+    ga('require', 'displayfeatures');
+    ga('set', 'dimension1', user_type); // user type - guest/readonly/habrauser
+    ga('set', 'dimension2', page_type);
+    
+    ga('set', 'dimension4', window.adb1);
+    ga('set', 'dimension6', 'ru');
+    ga('set', 'dimension7', 'A');
+
+
+    (function() {
+      var removeUtms = function(){
+        var location = window.location;
+        if (location.search.indexOf('utm_') != -1 && history.replaceState) {
+          var currentUrl = location.toString();
+          var strippedUrl = stripUrl(currentUrl, 'utm_');
+          history.replaceState({}, '', strippedUrl);
+        }
+      };
+      ga('require', 'GTM-559GVC8');
+      ga('send', 'pageview', { 'hitCallback': removeUtms });
+    })();
+
+    ga('HGM.set', 'dimension1', user_type);
+    ga('HGM.set', 'dimension2', "habrahabr");
+    ga('HGM.set', 'dimension4', window.adb1);
+
+    ga('HGM.send', 'pageview');
+  }
+
+
+  if (window.habr_blockers_checker) {
+    window.habr_blockers_checker.detectWrapper(callGA);
+  } else {
+    callGA(false)
+  }
+
+</script>
+
+<style>
+  body {
+    margin: 0;
+  }
+  .tm-blank-layout {
+    background-color: #fff;
+    box-sizing: border-box;
+    color: #22282d;
+    text-rendering: optimizeLegibility;
+    font-family: '-apple-system', BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    font-weight: normal;
+    margin: 0;
+    padding: 0;
+    transition: background-color 0.3s;
+  }
+  p {
+    margin: 0;
+  }
+  a {
+    color: #007aff;
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  a:hover {
+    color: #22282d;
+  }
+  .tm-blank-layout .tm-about__article-link {
+    word-break: break-word;
+    border-bottom: 1px solid #22282d;
+    padding-bottom: 2px;
+    color: #22282d;
+  }
+
+  .tm-blank-layout .tm-about__article-link:hover {
+    color: #007aff;
+    border-color: #007aff;
+  }
+
+  .tm-blank-layout_dark {
+    background-color: #303b44;
+    color: #F4F5F6;
+  }
+  .tm-blank-layout_dark a {
+    color: #51b3ff;
+  }
+  .tm-blank-layout_dark a:hover {
+    color: #F4F5F6;
+  }
+  .tm-blank-layout_dark .tm-about__article-link {
+    color: #F4F5F6;
+    border-bottom: 1px solid #F4F5F6;
+    padding-bottom: 2px;
+  }
+  .tm-blank-layout_dark .tm-about__article-link:hover {
+    color: #51b3ff;
+    border-color: #51b3ff;
+  }
+  .tm-blank-layout_dark .tm-about__lang {
+    background: #F4F5F6;
+    color: #222;
+  }
+  .tm-blank-layout_dark .tm-about__lang:hover {
+    color: #222;
+  }
+  .tm-blank-layout_dark .tm-about__text_bordered {
+    border-color: #51b3ff;
+  }
+
+  .tm-about__wrap {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    max-width: 940px;
+    padding: 148px 16px 0;
+  }
+
+  .tm-about__lang {
+    background: #303b44;
+    border: 0;
+    color: #F4F5F6;
+    cursor: pointer;
+    font-size: 17px;
+    height: 52px;
+    line-height: 52px;
+    position: absolute;
+    right: 0;
+    text-align: center;
+    top: 0;
+    user-select: none;
+    width: 52px;
+  }
+
+  .tm-about__lang:hover {
+    color: #F4F5F6;
+  }
+
+  .tm-about__text_type-1 {
+    animation: fadein 1s ease 0.3s forwards;
+    font-size: 30px;
+    line-height: 40px;
+    padding-bottom: 79px;
+    opacity: 0;
+  }
+
+  .tm-about__text_type-2 {
+    animation: fadein 1s ease 0.5s forwards;
+    font-size: 22px;
+    line-height: 32px;
+    padding-bottom: 76px;
+    opacity: 0;
+  }
+  .tm-about__post-title {
+    margin-bottom: 17px;
+  }
+
+  .tm-about__post {
+    margin: 0;
+    line-height: 44px;
+  }
+
+  .tm-about__posts {
+    padding-bottom: 72px;
+    padding-top: 4px;
+  }
+
+  .tm-about__corporate,
+  .tm-about__stats {
+    padding-bottom: 60px;
+  }
+
+  .tm-about__contacts {
+    line-height: 36px;
+    padding-bottom: 62px;
+  }
+
+  .tm-about__contacts .tm-about__article-link {
+    border: 0;
+  }
+
+  .tm-about__text_bordered {
+    border-bottom: 1px solid #007aff;
+    padding-bottom: 2px;
+  }
+
+  @keyframes fadein {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  </style>
+  </head>
+  <body>
+    <div class="tm-layout" id="layout">
+      <main class="tm-layout__container">
+        <div class="tm-blank-layout tm-blank-layout_dark">
+          <span id="changeLang" data-changelang="en" class="tm-about__lang tm-about__lang_dark">
+            En
+          </span>
+          <div class="tm-about__wrap">
+            <div class="tm-about__text tm-about__text_type-1"><span class="tm-about__text_bordered">
+              На&nbsp;&#8203;<a href="/ru/top/daily/">Хабре</a>&nbsp;&#8203;думающие&nbsp;&#8203;люди&nbsp;&#8203;делятся&nbsp;&#8203;уникальным&nbsp;&#8203;&#8203;опытом.&nbsp;&#8203;&#8203;Здесь&nbsp;будет&nbsp;&#8203;&#8203;одинаково&nbsp;&#8203;интересно&nbsp;&#8203;программистам&nbsp;&#8203;и&nbsp;журналистам,&nbsp;&#8203;&#8203;админам&nbsp;&#8203;и&nbsp;рекламщикам,&nbsp;&#8203;аналитикам&nbsp;&#8203;и&nbsp;дизайнерам,&nbsp;&#8203;менеджерам&nbsp;&#8203;высшего&nbsp;&#8203;и&nbsp;среднего&nbsp;&#8203;звена,&nbsp;&#8203;владельцам&nbsp;&#8203;крупных&nbsp;&#8203;компаний&nbsp;&#8203;и&nbsp;небольших&nbsp;&#8203;фирм,&nbsp;&#8203;а&nbsp;также&nbsp;&#8203;всем&nbsp;&#8203;тем,&nbsp;&#8203;для&nbsp;кого&nbsp;&#8203;IT&nbsp;—&nbsp;&#8203;это&nbsp;не&nbsp;просто&nbsp;&#8203;две&nbsp;буквы&nbsp;&#8203;алфавита.&nbsp;
+              </span>
+            </div>
+            <div class="tm-about__text tm-about__text_type-2">
+              Проект придумал <a href="/ru/users/deniskin/" class="">@deniskin</a> в&nbsp;<nobr>2006-м.</nobr>
+              Сначала это была небольшая новостная лента, но&nbsp;за&nbsp;12&nbsp;лет она превратилась в&nbsp;крупную площадку с&nbsp;многомиллионной аудиторией и&nbsp;необычными сервисами.
+              <br/>
+              <br/>
+              Люди пишут сюда интересные материалы на&nbsp;разные темы и&nbsp;комментируют&nbsp;их. Тут&nbsp;можно <a target="_blank" href="https://qna.habr.com/">задавать вопросы и&nbsp;получать ответы</a>, обсуждать <a href="/ru/top/" class="">актуальные темы</a>, <a target="_blank" href="https://career.habr.com/">искать работу</a> или&nbsp;<a target="_blank" href="https://freelance.habr.com/">фриланс</a> и&nbsp;напрямую общаться с&nbsp;<a href="/ru/companies/" class="">крупными компаниями</a>.
+              <br/>
+            </div>
+            <div class="tm-about__text tm-about__text_type-2 tm-about__posts">
+              <p class="tm-about__post-title">Популярные посты</p>
+                  <p class="tm-about__post">
+                    <a href="https://habr.com/ru/company/itsumma/blog/479942/" class="tm-about__article-link">
+                      [Обновлено в 10:52, 14.12.19] В офисе Nginx прошел обыск. Копейко: «Nginx был разработан Сысоевым самостоятельно»
+                    </a>
+                  </p>
+                  <p class="tm-about__post">
+                    <a href="https://habr.com/ru/post/470337/" class="tm-about__article-link">
+                      Как я проработала 3 месяца в Я.Маркете и уволилась
+                    </a>
+                  </p>
+                  <p class="tm-about__post">
+                    <a href="https://habr.com/ru/post/476034/" class="tm-about__article-link">
+                      Самый беззащитный — это Сапсан
+                    </a>
+                  </p>
+                  <p class="tm-about__post">
+                    <a href="https://habr.com/ru/post/480956/" class="tm-about__article-link">
+                      Как я нашел способ отследить всех водителей «Ситимобил»
+                    </a>
+                  </p>
+                  <p class="tm-about__post">
+                    <a href="https://habr.com/ru/post/505240/" class="tm-about__article-link">
+                      Тёмная сторона работы в Яндекс.Маркете
+                    </a>
+                  </p>
+                  <p class="tm-about__post">
+                    <a href="https://habr.com/ru/post/491974/" class="tm-about__article-link">
+                      Коронавирус: почему надо действовать прямо сейчас
+                    </a>
+                  </p>
+                  <p class="tm-about__post">
+                    <a href="https://habr.com/ru/company/yandex/blog/480090/" class="tm-about__article-link">
+                      Open source – наше всё
+                    </a>
+                  </p>
+                  <p class="tm-about__post">
+                    <a href="https://habr.com/ru/company/cognitivepilot/blog/514678/" class="tm-about__article-link">
+                      Наша огромная гордость: мирные советские роботы-комбайны убрали первый урожай в южных регионах
+                    </a>
+                  </p>
+            </div>
+            <div class="tm-about__text tm-about__text_type-1"><span class="tm-about__text_bordered">
+              На&nbsp;<a href="/ru/top/daily/">Хабре</a>&nbsp;&#8203;все&nbsp;равны.&nbsp;&#8203;Это&nbsp;&#8203;активное,&nbsp;&#8203;саморегулирующееся&nbsp;&#8203;сообщество,&nbsp;&#8203;которое&nbsp;&#8203;пропускает&nbsp;&#8203;только&nbsp;&#8203;качественный&nbsp;&#8203;контент:&nbsp;&#8203;интересные&nbsp;&#8203;посты&nbsp;&#8203;плюсуют&nbsp;&#8203;и&nbsp;активно&nbsp;&#8203;комментируют,&nbsp;&#8203;неинтересные&nbsp;&#8203;—&nbsp;&#8203;минусуют&nbsp;&#8203;и&nbsp;оставляют&nbsp;&#8203;без&nbsp;внимания.&nbsp;&#8203;Поддерживать&nbsp;&#8203;баланс&nbsp;&#8203;помогают&nbsp;&#8203;карма&nbsp;&#8203;и&nbsp;рейтинг.&nbsp;&#8203;Карма&nbsp;&#8203;иллюстрирует&nbsp;&#8203;отношение&nbsp;&#8203;сообщества&nbsp;&#8203;к&nbsp;пользователю,&nbsp;&#8203;а&nbsp;рейтинг&nbsp;&#8203;показывает&nbsp;&#8203;его&nbsp;вклад&nbsp;&#8203;в&nbsp;сообщество.&nbsp;&#8203;
+              </span>
+            </div>
+            <div class="tm-about__text tm-about__text_type-2">
+              Тот, кто публикует пост, может рассчитывать на&nbsp;живой интерес со&nbsp;стороны остальных участников: тысячи просмотров и&nbsp;десятки дельных комментариев оригинальному материалу гарантированы.
+              <br/>
+              <br/>
+              Команда проекта поддерживает сообщество и&nbsp;материально <a href="/ru/docs/help/settings/#donate" class="">поощряет авторов за&nbsp;посты</a>, если их&nbsp;высоко оценили читатели. Редакция готова помочь с&nbsp;оформлением материалов, добычей информации и&nbsp;аккредитацией на&nbsp;мероприятия. Все потому что контент&nbsp;— король.
+              <br/>
+            </div>
+            <div class="tm-about__text tm-about__text_type-1 tm-about__corporate"><span class="tm-about__text_bordered">
+              На&nbsp;<a href="/ru/top/daily/">Хабре</a>&nbsp;&#8203;ведут&nbsp;&#8203;блоги&nbsp;&#8203;<a href="/ru/companies/" class="">известные&nbsp;&#8203;компании.&nbsp;&#8203;</a>Они&nbsp;делятся&nbsp;&#8203;знаниями,&nbsp;&#8203;опытом&nbsp;&#8203;и&nbsp;узнают&nbsp;&#8203;мнение&nbsp;&#8203;о&nbsp;своих&nbsp;&#8203;продуктах&nbsp;&#8203;из&nbsp;первых&nbsp;&#8203;рук,&nbsp;&#8203;а&nbsp;пользователи&nbsp;&#8203;задают&nbsp;&#8203;им&nbsp;вопросы&nbsp;&#8203;напрямую&nbsp;&#8203;и&nbsp;получают&nbsp;&#8203;ответы.&nbsp;
+              </span>
+            </div>
+            <p class="tm-about__text tm-about__text_type-2 tm-about__stats">
+              За последние сутки появилось 29&nbsp;постов, 
+              их прочитали 411 613&nbsp;раза
+              и добавили 1 036&nbsp;комментариев.
+            </p>
+            <div class="tm-about__text tm-about__text_type-2 tm-about__contacts">
+              <a target="_blank" href="https://habr.com/" class="tm-about__article-link">habr.com</a> <br> <a href="mailto:info@habr.com" class="tm-about__article-link">info@habr.com</a> <br>
+                Москва, Спартаковский переулок, дом&nbsp;2, строение&nbsp;1, секция&nbsp;3
+                <br>
+                +7 499 653-59-61
+              <br/>
+              <br/>
+              <a target="_blank" href="https://www.facebook.com/habrahabr.ru">facebook</a>,
+              <a target="_blank" href="https://twitter.com/habr_com">twitter</a>,
+              <a target="_blank" href="https://vk.com/habr">vk</a>,
+              <a target="_blank" href="https://www.youtube.com/channel/UCd_sTwKqVrweTt4oAKY5y4w">youtube</a>,
+              <a target="_blank" href="https://t.me/habr_com">telegram</a>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script>
+      var xhr = new XMLHttpRequest();
+      xhr.responseType = 'json';
+
+      function addListener () {
+        document.querySelector('#changeLang').addEventListener('click', function () {
+
+          xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+              if (xhr.status === 200) {
+                document.querySelector('#layout').innerHTML = xhr.response.body;
+                document.head.innerHTML = xhr.response.head;
+                addListener();
+              } else {
+                console.log('Error in xhr request');
+              }
+            }
+          };
+          var url = '/ru/about/get_content/?lang='+this.getAttribute('data-changelang');
+          xhr.open("GET", url);
+          xhr.send();
+        });
+      }
+
+      addListener();
+    </script>
+  </body>
+</html>
