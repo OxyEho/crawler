@@ -37,8 +37,10 @@ class Crawler(object):
     directory_for_download: str
     seen_hosts: Set[str]
     disallow_urls: Set
+    download: bool
 
-    def __init__(self, start_url, request, white_domains, max_urls_count=10, directory_for_download='log'):
+    def __init__(self, start_url, request, white_domains, max_urls_count=10,
+                 directory_for_download='log', download=False):
         self.urls = Queue()
         self.urls.put(Page(start_url, origin_directory=directory_for_download))
         self.result_urls = set()
@@ -51,6 +53,7 @@ class Crawler(object):
         self.directory_for_download = directory_for_download
         self.seen_hosts = set()
         self.disallow_urls = set()
+        self.download = download
 
     def fill_disallow_urls(self, url):
         parser = Parser(url)
@@ -139,7 +142,8 @@ class Crawler(object):
                 info = parser.get_info(html, page.url)
                 if len(self.request.intersection(info)) != 0 and page.url not in self.result_urls:
                     self.result_urls.add(page)
-                    self.write_html(page, html)
+                    if self.download:
+                        self.write_html(page, html)
                 found_links = set(parser.get_urls(html))
                 max_count_from_page = 0
                 for link in found_links.difference(self.seen_urls):
