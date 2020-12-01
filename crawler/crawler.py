@@ -12,7 +12,7 @@ lock = Lock()
 
 
 class Page:
-    def __init__(self, url: str, parent=None, origin_directory = 'log'):
+    def __init__(self, url: str, parent=None, origin_directory='log'):
         self.url = url
         self.parent = parent
         if parent:
@@ -75,7 +75,8 @@ class Crawler(object):
                     string = string.replace('*', '.+')
                     string = string.split(':')
                     lock.acquire()
-                    self.disallow_urls.add(re.compile(fr"{host}{string[1][2::]}", re.IGNORECASE))
+                    self.disallow_urls.add(
+                        re.compile(fr"{host}{string[1][2::]}", re.IGNORECASE))
                     lock.release()
         except IndexError:
             pass
@@ -93,8 +94,10 @@ class Crawler(object):
         try:
             self.fill_disallow_urls(url)
             return requests.get(url).text
-        except (requests.exceptions.MissingSchema, requests.exceptions.ConnectionError,
-                requests.exceptions.InvalidSchema, requests.exceptions.ContentDecodingError):
+        except (requests.exceptions.MissingSchema,
+                requests.exceptions.ConnectionError,
+                requests.exceptions.InvalidSchema,
+                requests.exceptions.ContentDecodingError):
             return None
 
     def write_html(self, page: Page, html: str):
@@ -104,10 +107,12 @@ class Crawler(object):
         if page.parent is not None:
             page_path = page.parent.children_directory
             os.makedirs(page_path, exist_ok=True)
-            with open(f'{page_path}/{name}.html', 'w', encoding='utf-8') as writing:
+            with open(f'{page_path}/{name}.html', 'w',
+                      encoding='utf-8') as writing:
                 writing.write(html)
         else:
-            with open(f'{self.directory_for_download}/{name}.html', 'w', encoding='utf-8') as writing:
+            with open(f'{self.directory_for_download}/{name}.html',
+                      'w', encoding='utf-8') as writing:
                 writing.write(html)
 
     def check_domains(self, url: str):
@@ -140,7 +145,8 @@ class Crawler(object):
                 self.visited_urls_count += 1
                 parser = Parser(page.url)
                 info = parser.get_info(html, page.url)
-                if len(self.request.intersection(info)) != 0 and page.url not in self.result_urls:
+                if len(self.request.intersection(info)) != 0 \
+                        and page.url not in self.result_urls:
                     self.result_urls.add(page)
                     if self.download:
                         self.write_html(page, html)
