@@ -77,7 +77,8 @@ class TestsCrawler(unittest.TestCase):
                     'https://www.scala-lang.org/download/')
                 test_result = test_crawler.crawl()
                 assert 'http://scala-lang.org' not in test_result and \
-                       'https://www.scala-lang.org/download/' not in test_result
+                       'https://www.scala-lang.org/download/' not in \
+                       test_result
 
     def test_searcher_with_domains(self):
         with patch.object(Crawler, 'get_html') as mock_get_html:
