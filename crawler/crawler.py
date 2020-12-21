@@ -6,6 +6,7 @@ from threading import Thread, Lock
 from queue import Queue, Empty
 from urllib.parse import urlparse
 from typing import Set, Dict
+from yarl import URL
 
 from crawler.parser import Parser
 
@@ -45,7 +46,7 @@ class Crawler(object):
                  directory_for_download='log', download=False):
         self.urls = Queue()
         self.urls.put(Page(start_url, origin_directory=directory_for_download))
-        self.result_urls = set()
+        self.result_urls: Set[Page] = set()
         self.max_count_urls = max_urls_count
         self.visited_urls_count = 0
         self.request = set(word.strip().lower() for word in request)
@@ -153,12 +154,8 @@ class Crawler(object):
                     if self.download:
                         self.write_html(page, html)
                 found_links = set(parser.get_urls(html))
-                max_count_from_page = 0
                 for link in found_links.difference(self.seen_urls):
                     self.urls.put(Page(link, parent=page))
-                    max_count_from_page += 1
-                    if max_count_from_page == 10:
-                        break
             else:
                 return
         finally:
