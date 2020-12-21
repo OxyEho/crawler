@@ -1,11 +1,13 @@
 import os
 import requests
-from threading import Thread, Lock
 import re
+
+from threading import Thread, Lock
 from queue import Queue, Empty
 from urllib.parse import urlparse
-from crawler.parser import Parser
 from typing import Set, Dict
+
+from crawler.parser import Parser
 
 
 lock = Lock()
@@ -90,7 +92,7 @@ class Crawler(object):
         lock.release()
         return False
 
-    def get_html(self, url):
+    def get_html(self, url: str):
         try:
             self.fill_disallow_urls(url)
             return requests.get(url).text
@@ -128,7 +130,7 @@ class Crawler(object):
                     return True
         return False
 
-    def analyze_url(self, page):
+    def analyze_url(self, page: Page):
         try:
             self.seen_urls.add(page.url)
             if not self.check_domains(page.url):
