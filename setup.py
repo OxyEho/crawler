@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="sniffer",
+    name="crawler",
     version="0.1",
     author="Vedernikov Valera",
     author_email="valera808@inbox.ru",
