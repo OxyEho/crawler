@@ -1,0 +1,8 @@
+matplotlib~=3.3.3
+numpy
+networkx~=2.5
+coverage==5.1
+requests~=2.25.1
+beautifulsoup4~=4.9.3
+yarl~=1.6.3
+setuptools~=51.1.0

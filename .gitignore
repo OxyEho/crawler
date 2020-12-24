@@ -1,0 +1,8 @@
+venv/result_urls.json
+pyvenv.cfg
+venv
+.idea
+Scripts
+Lib
+__pycache__
+crawler/__pycache__
