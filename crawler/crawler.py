@@ -190,11 +190,12 @@ class Crawler:
                         self.write_html(page, html)
                 found_links = set(parser.get_urls(html))
                 for link in found_links.difference(self.seen_urls):
-                    if link[-1] == '/':
-                        page = Page(URL(link[:-1]))
-                    else:
-                        page = Page(URL(link))
-                    self.urls.put(page)
+                    if link:
+                        if link[-1] == '/':
+                            page = Page(URL(link[:-1]))
+                        else:
+                            page = Page(URL(link))
+                        self.urls.put(page)
             else:
                 return
         finally:
