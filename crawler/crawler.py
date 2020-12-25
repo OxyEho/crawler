@@ -59,7 +59,8 @@ class Crawler:
     def __init__(self, start_url, request, white_domains, max_urls_count=10,
                  directory_for_download='log', download=False):
         self.urls = Queue()
-        self.urls.put(Page(URL(start_url), origin_directory=directory_for_download))
+        self.urls.put(Page(URL(start_url),
+                           origin_directory=directory_for_download))
         self.result_urls: Set[Page] = set()
         self.max_count_urls = max_urls_count
         self.visited_urls_count = 0

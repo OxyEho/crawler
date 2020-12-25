@@ -3,8 +3,9 @@ import re
 import requests
 
 from unittest.mock import patch
+from yarl import URL
 
-from crawler.crawler import Crawler
+from crawler.crawler import Crawler, Page
 
 
 class FakeResponse:
@@ -157,6 +158,20 @@ class TestsCrawler(unittest.TestCase):
                 test_crawler.fill_disallow_urls('https://a/')
                 self.assertEqual({re.compile('https://a/b.+', re.IGNORECASE)},
                                  test_crawler.disallow_urls)
+
+    def test_update_parents(self):
+        with patch.object(Crawler, 'get_html') as mock_get_html:
+            mock_get_html.return_value = '<a href=a/c/></a>' \
+                                         '<a href=a/b/></a>'
+            with patch.object(Crawler, 'write_html') as mock_write_html:
+                mock_write_html.return_value = None
+            test_crawler = Crawler(
+                'a',
+                [''], {}, max_urls_count=3)
+            test_result = test_crawler.crawl()
+            for page in test_result:
+                if page.parent:
+                    self.assertEqual(page.parent, Page(URL('a')))
 
 
 if __name__ == '__main__':

@@ -13,7 +13,7 @@ def show_graph(pages):
             graph.add_edge(page.parent.link, page.link)
     nx.draw(graph,
             node_color='red',
-            node_size=100,
+            node_size=1000,
             with_labels=True,
             alpha=0.6)
 
