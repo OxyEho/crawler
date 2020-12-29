@@ -24,6 +24,7 @@ class TestsCrawler(unittest.TestCase):
                     {},
                     2)
                 test_result = test_crawler.crawl()
+                test_crawler.close()
                 self.assertEqual(test_result, set())
 
     def test_searcher_with_result(self):
@@ -45,6 +46,7 @@ class TestsCrawler(unittest.TestCase):
                     'https://docs.scala-lang.org/ru/tour/tour-of-scala.html',
                     ['scala'], {})
                 test_result = test_crawler.crawl()
+                test_crawler.close()
                 self.assertEqual(len(test_result), 10)
 
     def test_searcher_with_seen_urls(self):
@@ -56,8 +58,9 @@ class TestsCrawler(unittest.TestCase):
                 test_crawler = Crawler(
                     'https://docs.scala-lang.org/ru/tour/tour-of-scala.html',
                     ['scala'], {}, 2)
-                test_crawler.seen_urls.add('http://scala-lang.org')
+                test_crawler.seen_urls.add(Page(URL('http://scala-lang.org')))
                 test_result = test_crawler.crawl()
+                test_crawler.close()
                 assert 'http://scala-lang.org' not in test_result
 
     def test_searcher_with_two_seen_urls(self):
@@ -75,8 +78,9 @@ class TestsCrawler(unittest.TestCase):
                     ['scala'], {}, 4)
                 test_crawler.seen_urls.add('http://scala-lang.org')
                 test_crawler.seen_urls.add(
-                    'https://www.scala-lang.org/download/')
+                    Page(URL('https://www.scala-lang.org/download/')))
                 test_result = test_crawler.crawl()
+                test_crawler.close()
                 assert 'http://scala-lang.org' not in test_result and \
                        'https://www.scala-lang.org/download/' not in \
                        test_result
@@ -102,6 +106,7 @@ class TestsCrawler(unittest.TestCase):
                     'https://docs.scala-lang.org/ru/tour/tour-of-scala.html',
                     ['scala'], ['docs.scala-lang.org'])
                 test_result = test_crawler.crawl()
+                test_crawler.close()
                 self.assertEqual(len(test_result), 2)
 
     def test_searcher_with_disallow_url(self):
@@ -123,6 +128,7 @@ class TestsCrawler(unittest.TestCase):
                 test_crawler.disallow_urls.add(
                     re.compile(r'https://scala5.html'))
                 test_result = test_crawler.crawl()
+                test_crawler.close()
                 self.assertEqual(len(test_result), 9)
 
     def test_searcher_with_disallow_urls(self):
@@ -145,6 +151,7 @@ class TestsCrawler(unittest.TestCase):
                 test_crawler.disallow_urls.add(
                     re.compile(r'https://scala.*?.html'))
                 test_result = test_crawler.crawl()
+                test_crawler.close()
                 self.assertEqual(len(test_result), 1)
 
     def test_fill_disallow_urls_from_robot(self):
@@ -156,6 +163,7 @@ class TestsCrawler(unittest.TestCase):
                     'https://a/',
                     [''], {})
                 test_crawler.fill_disallow_urls(URL('https://a/'))
+                test_crawler.close()
                 self.assertEqual({re.compile('https://a/b.+', re.IGNORECASE)},
                                  test_crawler.disallow_urls)
 
@@ -169,6 +177,7 @@ class TestsCrawler(unittest.TestCase):
                 'http://a',
                 [''], {}, max_urls_count=3)
             test_result = test_crawler.crawl()
+            test_crawler.close()
             for page in test_result:
                 if page.parent:
                     self.assertEqual(page.parent,

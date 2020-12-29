@@ -1,17 +1,14 @@
-import os
 import requests
 import re
 
-from threading import Thread, Lock
+from multiprocessing.pool import ThreadPool
 from queue import Queue, Empty
 from urllib.parse import urlparse
-from typing import Set, Dict
+from typing import Set
 from yarl import URL
 from pathlib import Path
 
 from crawler.parser import Parser
-
-lock = Lock()
 
 
 class Page:
@@ -43,7 +40,6 @@ class Crawler:
     visited_urls_count: int
     white_domains: list
     result_urls: Set[Page]
-    current_threads: Dict[Page, Thread]
     origin_directory: str
     seen_hosts: Set[URL]
     disallow_urls: Set
@@ -59,11 +55,11 @@ class Crawler:
         self.request = set(word.strip().lower() for word in request)
         self.seen_urls = set()
         self.white_domains = white_domains
-        self.current_threads = {}
         self.origin_directory = directory_for_download
         self.seen_hosts = set()
         self.disallow_urls = set()
         self.download = download
+        self.thread_pool = ThreadPool(processes=10)
 
     def fill_disallow_urls(self, url: URL):
         parser = Parser(url)
@@ -84,20 +80,16 @@ class Crawler:
                 if string.startswith('disallow'):
                     string = string.replace('*', '.+')
                     string = string.split(':')
-                    lock.acquire()
                     self.disallow_urls.add(
-                        re.compile(fr"{host}/{string[1][2::]}", re.IGNORECASE))
-                    lock.release()
+                        re.compile(fr"{host}/{string[1][2::]}",
+                                   re.IGNORECASE))
         except IndexError:
             pass
 
     def analyze_robot(self, url: URL) -> bool:
-        lock.acquire()
         for reg_dis_url in self.disallow_urls:
             if re.search(reg_dis_url, str(url)):
-                lock.release()
                 return True
-        lock.release()
         return False
 
     def get_html(self, url: URL):
@@ -116,7 +108,10 @@ class Crawler:
         parent_path = Path(origin_directory) / host / page.url.parent.path[1:]
         parent_path.mkdir(parents=True, exist_ok=True)
         # Добавляю _page поскольку имя файла и директории не могут совпадать
-        path = parent_path / f'{page.url.name}_page'
+        name = page.url.name
+        if name == '':
+            name = page.url.host
+        path = parent_path / f'{name}_page'
         with path.open('w', encoding='utf-8') as file:
             file.write(html)
 
@@ -134,7 +129,6 @@ class Crawler:
         return False
 
     def update_parents(self):
-        lock.acquire()
         for page in self.result_urls:
             current_page = page
             page_parent = Page(current_page.url.parent)
@@ -145,63 +139,47 @@ class Crawler:
                 current_page = page_parent
                 page_parent = Page(page_parent.url.parent)
 
-        lock.release()
-
     def analyze_url(self, page: Page):
-        try:
+        self.seen_urls.add(page)
+        if not self.check_domains(str(page)):
+            return
+        html = self.get_html(page.url)
+        if html is None:
+            return
+        if self.analyze_robot(page.url):
+            return
+        if self.visited_urls_count < self.max_count_urls:
             self.visited_urls_count += 1
-            self.seen_urls.add(page)
-            if not self.check_domains(str(page)):
-                self.current_threads.pop(page)
-                return
-            html = self.get_html(page.url)
-            if html is None:
-                self.current_threads.pop(page)
-                return
-            if self.analyze_robot(page.url):
-                self.current_threads.pop(page)
-                return
-            if self.visited_urls_count <= self.max_count_urls:
-                parser = Parser(page.url)
-                info = parser.get_info(html, str(page))
-                if len(self.request.intersection(info)) != 0 \
-                        and page not in self.result_urls:
-                    self.result_urls.add(page)
-                    self.update_parents()
-                    if self.download:
-                        self.write_html(page, html)
-                found_links = set(parser.get_urls(html))
-                for link in found_links.difference(self.seen_urls):
-                    if link:
-                        if str(link)[-1] == '/':
-                            page = Page(link.parent)
-                        else:
-                            page = Page(link)
-                        self.urls.put(page)
-            else:
-                return
-        finally:
-            self.current_threads.pop(page, None)
+            parser = Parser(page.url)
+            info = parser.get_info(html, str(page))
+            if len(self.request.intersection(info)) != 0 \
+                    and page not in self.result_urls:
+                self.result_urls.add(page)
+                self.update_parents()
+                if self.download:
+                    self.write_html(page, html)
+            found_links = set(parser.get_urls(html))
+            for link in found_links.difference(self.seen_urls):
+                if link:
+                    if str(link)[-1] == '/':
+                        page = Page(link.parent)
+                    else:
+                        page = Page(link)
+                    self.urls.put(page)
+        else:
+            return
 
     def crawl(self):
         while self.visited_urls_count < self.max_count_urls:
-            if not self.current_threads and self.urls.empty():
+            try:
+                page = self.urls.get(timeout=1)
+                if page in self.seen_urls:
+                    continue
+            except Empty:
                 break
-            if len(self.current_threads) < self.max_count_urls:
-                try:
-                    page = self.urls.get(timeout=3)
-                    if page in self.seen_urls:
-                        continue
-                except Empty:
-                    if not self.current_threads:
-                        break
-                thread = Thread(target=self.analyze_url, args=(page,))
-                self.current_threads[page] = thread
-                thread.start()
-        lock.acquire()
-        undone_threads = list(self.current_threads.values())
-        lock.release()
-        for thread in undone_threads:
-            if thread.is_alive():
-                thread.join()
+            self.thread_pool.apply_async(self.analyze_url, args=(page,))
         return self.result_urls
+
+    def close(self):
+        self.thread_pool.terminate()
+        self.thread_pool.join()

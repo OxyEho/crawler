@@ -1,6 +1,6 @@
 import unittest
 
-from yarl import  URL
+from yarl import URL
 
 from unittest.mock import patch
 from crawler.crawler import Crawler
