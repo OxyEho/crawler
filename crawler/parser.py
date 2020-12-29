@@ -1,34 +1,26 @@
 import re
 from typing import List, Set
-from urllib.parse import urlparse
 from bs4 import BeautifulSoup
+from yarl import URL
 
 
 class Parser:
-    host: str
+    host: URL
     description_finder = re.compile(r'<meta [\w:]+="[\w:" ]+="([^>]+)"/>')
     title_finder = re.compile(r'<title>(.+)</title>')
 
-    def __init__(self, url: str):
-        self.host = Parser.get_host(url)
+    def __init__(self, url: URL):
+        self.host = url.origin()
 
-    def get_urls(self, page: str) -> List[str]:
+    def get_urls(self, page: str) -> List[URL]:
         soup = BeautifulSoup(page, 'html.parser')
         result = []
         for link in soup.find_all('a', href=True):
             if link['href'].startswith('/'):
-                if self.host[-1] == '/':
-                    result.append(self.host[:-1] + link['href'])
-                else:
-                    result.append(self.host + link['href'])
+                result.append(self.host / link['href'][1:])
             elif '#' not in link['href']:
-                result.append(link['href'])
+                result.append(URL(link['href']))
         return result
-
-    @staticmethod
-    def get_host(url: str) -> str:
-        parsed_url = urlparse(url)
-        return f'{parsed_url.scheme}://{parsed_url.netloc}/'
 
     @staticmethod
     def get_info(html: str, url: str) -> Set[str]:

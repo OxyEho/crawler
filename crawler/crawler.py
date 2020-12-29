@@ -7,6 +7,7 @@ from queue import Queue, Empty
 from urllib.parse import urlparse
 from typing import Set, Dict
 from yarl import URL
+from pathlib import Path
 
 from crawler.parser import Parser
 
@@ -14,53 +15,44 @@ lock = Lock()
 
 
 class Page:
-    def __init__(self, url: URL, origin_directory):
+    def __init__(self, url: URL):
         self.url = url
         self.parent = None
-        self.origin_directory = origin_directory
-        self.children_directory = os.path.join(
-                origin_directory,
-                re.sub(r'[\\/?:*"><]', '_', self.link) + '_children')
 
     def __hash__(self):
-        return hash(str(self.link))
+        return hash(str(self._link))
 
     def __eq__(self, other):
-        return self.link == other.link
+        if isinstance(other, Page):
+            return self.url == other.url
+        return False
 
     def __str__(self):
-        return self.link
+        return self._link
 
     @property
-    def link(self):
+    def _link(self):
         return str(self.url)
-
-    def update_directory(self):
-        if self.parent:
-            self.children_directory = os.path.join(
-                self.parent.children_directory,
-                re.sub(r'[\\/?:*"><]', '_', self.link) + '_children')
 
 
 class Crawler:
     urls: Queue
     request: Set[str]
-    seen_urls: Set[str]
+    seen_urls: Set[Page]
     max_count_urls: int
     visited_urls_count: int
     white_domains: list
     result_urls: Set[Page]
-    current_threads: Dict[str, Thread]
-    directory_for_download: str
-    seen_hosts: Set[str]
+    current_threads: Dict[Page, Thread]
+    origin_directory: str
+    seen_hosts: Set[URL]
     disallow_urls: Set
     download: bool
 
     def __init__(self, start_url, request, white_domains, max_urls_count=10,
                  directory_for_download='pages', download=False):
         self.urls = Queue()
-        self.urls.put(Page(URL(start_url),
-                           directory_for_download))
+        self.urls.put(Page(URL(start_url)))
         self.result_urls: Set[Page] = set()
         self.max_count_urls = max_urls_count
         self.visited_urls_count = 0
@@ -68,19 +60,19 @@ class Crawler:
         self.seen_urls = set()
         self.white_domains = white_domains
         self.current_threads = {}
-        self.directory_for_download = directory_for_download
+        self.origin_directory = directory_for_download
         self.seen_hosts = set()
         self.disallow_urls = set()
         self.download = download
 
-    def fill_disallow_urls(self, url: str):
+    def fill_disallow_urls(self, url: URL):
         parser = Parser(url)
         host = parser.host
         if host in self.seen_hosts:
             return
         self.seen_hosts.add(host)
-        robots_txt_url = parser.host + 'robots.txt'
-        robots_txt = requests.get(robots_txt_url).text.lower()
+        robots_txt_url = parser.host / 'robots.txt'
+        robots_txt = requests.get(str(robots_txt_url)).text.lower()
         try:
             index = robots_txt.index('user-agent: *')
         except ValueError:
@@ -94,24 +86,24 @@ class Crawler:
                     string = string.split(':')
                     lock.acquire()
                     self.disallow_urls.add(
-                        re.compile(fr"{host}{string[1][2::]}", re.IGNORECASE))
+                        re.compile(fr"{host}/{string[1][2::]}", re.IGNORECASE))
                     lock.release()
         except IndexError:
             pass
 
-    def analyze_robot(self, url: str) -> bool:
+    def analyze_robot(self, url: URL) -> bool:
         lock.acquire()
         for reg_dis_url in self.disallow_urls:
-            if re.search(reg_dis_url, url):
+            if re.search(reg_dis_url, str(url)):
                 lock.release()
                 return True
         lock.release()
         return False
 
-    def get_html(self, url: str):
+    def get_html(self, url: URL):
         try:
             self.fill_disallow_urls(url)
-            return requests.get(url).text
+            return requests.get(str(url)).text
         except (requests.exceptions.MissingSchema,
                 requests.exceptions.ConnectionError,
                 requests.exceptions.InvalidSchema,
@@ -119,19 +111,14 @@ class Crawler:
             return None
 
     def write_html(self, page: Page, html: str):
-        reg_exp = re.compile(r'[\\/?:*"><]')
-        name = re.sub(reg_exp, '_', page.link)
-        os.makedirs(self.directory_for_download, exist_ok=True)
-        if page.parent is not None:
-            page_path = page.parent.children_directory
-            os.makedirs(page_path, exist_ok=True)
-            with open(f'{page_path}/{name}.html', 'w',
-                      encoding='utf-8') as writing:
-                writing.write(html)
-        else:
-            with open(f'{self.directory_for_download}/{name}.html',
-                      'w', encoding='utf-8') as writing:
-                writing.write(html)
+        host = page.url.host
+        origin_directory = self.origin_directory
+        parent_path = Path(origin_directory) / host / page.url.parent.path[1:]
+        parent_path.mkdir(parents=True, exist_ok=True)
+        # Добавляю _page поскольку имя файла и директории не могут совпадать
+        path = parent_path / f'{page.url.name}_page'
+        with path.open('w', encoding='utf-8') as file:
+            file.write(html)
 
     def check_domains(self, url: str):
         if len(self.white_domains) == 0:
@@ -150,40 +137,33 @@ class Crawler:
         lock.acquire()
         for page in self.result_urls:
             current_page = page
-            page_parent = Page(current_page.url.parent,
-                               self.directory_for_download)
-            # Поиск ближайшего родственника
+            page_parent = Page(current_page.url.parent)
             while current_page != page_parent:
                 if page_parent in self.result_urls:
                     page.parent = page_parent
-                    page.update_directory()
                     break
                 current_page = page_parent
-                page_parent = Page(page_parent.url.parent,
-                                   self.directory_for_download)
-            # Поиск непосредственного родителя
-            # if page_parent in self.result_urls:
-            #     page.parent = page_parent
+                page_parent = Page(page_parent.url.parent)
 
         lock.release()
 
     def analyze_url(self, page: Page):
         try:
             self.visited_urls_count += 1
-            self.seen_urls.add(page.link)
-            if not self.check_domains(page.link):
-                self.current_threads.pop(page.link)
+            self.seen_urls.add(page)
+            if not self.check_domains(str(page)):
+                self.current_threads.pop(page)
                 return
-            html = self.get_html(page.link)
+            html = self.get_html(page.url)
             if html is None:
-                self.current_threads.pop(page.link)
+                self.current_threads.pop(page)
                 return
-            if self.analyze_robot(page.link):
-                self.current_threads.pop(page.link)
+            if self.analyze_robot(page.url):
+                self.current_threads.pop(page)
                 return
             if self.visited_urls_count <= self.max_count_urls:
-                parser = Parser(page.link)
-                info = parser.get_info(html, page.link)
+                parser = Parser(page.url)
+                info = parser.get_info(html, str(page))
                 if len(self.request.intersection(info)) != 0 \
                         and page not in self.result_urls:
                     self.result_urls.add(page)
@@ -193,17 +173,15 @@ class Crawler:
                 found_links = set(parser.get_urls(html))
                 for link in found_links.difference(self.seen_urls):
                     if link:
-                        if link[-1] == '/':
-                            page = Page(URL(link[:-1]),
-                                        self.directory_for_download)
+                        if str(link)[-1] == '/':
+                            page = Page(link.parent)
                         else:
-                            page = Page(URL(link),
-                                        self.directory_for_download)
+                            page = Page(link)
                         self.urls.put(page)
             else:
                 return
         finally:
-            self.current_threads.pop(page.link, None)
+            self.current_threads.pop(page, None)
 
     def crawl(self):
         while self.visited_urls_count < self.max_count_urls:
@@ -212,13 +190,13 @@ class Crawler:
             if len(self.current_threads) < self.max_count_urls:
                 try:
                     page = self.urls.get(timeout=3)
-                    if page.link in self.seen_urls:
+                    if page in self.seen_urls:
                         continue
                 except Empty:
                     if not self.current_threads:
                         break
                 thread = Thread(target=self.analyze_url, args=(page,))
-                self.current_threads[page.link] = thread
+                self.current_threads[page] = thread
                 thread.start()
         lock.acquire()
         undone_threads = list(self.current_threads.values())

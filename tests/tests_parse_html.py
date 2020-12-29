@@ -1,4 +1,7 @@
 import unittest
+
+from yarl import  URL
+
 from unittest.mock import patch
 from crawler.crawler import Crawler
 from crawler.parser import Parser
@@ -9,19 +12,19 @@ class TestsHtml(unittest.TestCase):
         with patch.object(Crawler, 'get_html') as mock_get_html:
             mock_get_html.return_value = None
             crawler = Crawler('https://vcsacsavsdsdk.com/feed/', ['a'], {})
-            test_result = crawler.get_html('https://vcsacsavsdsdk.com/feed/')
+            test_result = crawler.get_html(URL('https://vcsacsavsdsdk.com'))
         self.assertIsNone(test_result)
 
     def test_get_url_with_not_url(self):
         with open('test_.html', 'r') as test:
             text = test.read()
-            test_url = Parser('https://t/')
+            test_url = Parser(URL('https://t/'))
             self.assertEqual(len(test_url.get_urls(text)), 0)
 
     def test_get_url_with_urls(self):
         with open('test.html', 'r') as test:
             text = test.read()
-            test_url = Parser('https://t/')
+            test_url = Parser(URL('https://t/'))
             self.assertEqual(len(test_url.get_urls(text)), 4)
 
 
