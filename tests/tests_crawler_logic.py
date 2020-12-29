@@ -172,8 +172,7 @@ class TestsCrawler(unittest.TestCase):
             for page in test_result:
                 if page.parent:
                     self.assertEqual(page.parent,
-                                     Page(URL('http://a'),
-                                          test_crawler.origin_directory))
+                                     Page(URL('http://a')))
 
 
 if __name__ == '__main__':
