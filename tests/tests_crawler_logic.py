@@ -147,7 +147,7 @@ class TestsCrawler(unittest.TestCase):
                 test_result = test_crawler.crawl()
                 self.assertEqual(len(test_result), 1)
 
-    def test_fill_disallow_urls(self):
+    def test_fill_disallow_urls_from_robot(self):
         with patch.object(requests, 'get') as mock_get:
             with open('fake_robots.txt', 'r') as fake_robots_txt:
                 mock_get.return_value = FakeResponse()
@@ -171,7 +171,9 @@ class TestsCrawler(unittest.TestCase):
             test_result = test_crawler.crawl()
             for page in test_result:
                 if page.parent:
-                    self.assertEqual(page.parent, Page(URL('a')))
+                    self.assertEqual(page.parent,
+                                     Page(URL('a'),
+                                          test_crawler.directory_for_download))
 
 
 if __name__ == '__main__':

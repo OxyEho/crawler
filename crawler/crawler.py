@@ -14,9 +14,9 @@ lock = Lock()
 
 
 class Page:
-    def __init__(self, url: URL, parent=None, origin_directory='log'):
+    def __init__(self, url: URL, origin_directory):
         self.url = url
-        self.parent = parent
+        self.parent = None
         self.origin_directory = origin_directory
         self.children_directory = os.path.join(
                 origin_directory,
@@ -57,10 +57,10 @@ class Crawler:
     download: bool
 
     def __init__(self, start_url, request, white_domains, max_urls_count=10,
-                 directory_for_download='log', download=False):
+                 directory_for_download='pages', download=False):
         self.urls = Queue()
         self.urls.put(Page(URL(start_url),
-                           origin_directory=directory_for_download))
+                           directory_for_download))
         self.result_urls: Set[Page] = set()
         self.max_count_urls = max_urls_count
         self.visited_urls_count = 0
@@ -150,7 +150,8 @@ class Crawler:
         lock.acquire()
         for page in self.result_urls:
             current_page = page
-            page_parent = Page(current_page.url.parent)
+            page_parent = Page(current_page.url.parent,
+                               self.directory_for_download)
             # Поиск ближайшего родственника
             while current_page != page_parent:
                 if page_parent in self.result_urls:
@@ -158,7 +159,8 @@ class Crawler:
                     page.update_directory()
                     break
                 current_page = page_parent
-                page_parent = Page(page_parent.url.parent)
+                page_parent = Page(page_parent.url.parent,
+                                   self.directory_for_download)
             # Поиск непосредственного родителя
             # if page_parent in self.result_urls:
             #     page.parent = page_parent
@@ -192,9 +194,11 @@ class Crawler:
                 for link in found_links.difference(self.seen_urls):
                     if link:
                         if link[-1] == '/':
-                            page = Page(URL(link[:-1]))
+                            page = Page(URL(link[:-1]),
+                                        self.directory_for_download)
                         else:
-                            page = Page(URL(link))
+                            page = Page(URL(link),
+                                        self.directory_for_download)
                         self.urls.put(page)
             else:
                 return

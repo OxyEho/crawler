@@ -29,7 +29,7 @@ if __name__ == '__main__':
                                       default='', help='White domains')
         arguments_parser.add_argument('-d', type=int, default=10,
                                       help='Maximum number of pages visited')
-        arguments_parser.add_argument('-f', type=str, default='log',
+        arguments_parser.add_argument('-f', type=str, default='pages',
                                       help='Directory for downloaded pages')
         arguments_parser.add_argument('-g', action='store_true',
                                       help='Show graph')
