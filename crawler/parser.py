@@ -1,9 +1,10 @@
 import re
+from typing import List, Set
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 
 
-class Parser(object):
+class Parser:
     host: str
     description_finder = re.compile(r'<meta [\w:]+="[\w:" ]+="([^>]+)"/>')
     title_finder = re.compile(r'<title>(.+)</title>')
@@ -11,23 +12,26 @@ class Parser(object):
     def __init__(self, url: str):
         self.host = Parser.get_host(url)
 
-    def get_urls(self, page: str):
+    def get_urls(self, page: str) -> List[str]:
         soup = BeautifulSoup(page, 'html.parser')
         result = []
         for link in soup.find_all('a', href=True):
             if link['href'].startswith('/'):
-                result.append(self.host + link['href'])
+                if self.host[-1] == '/':
+                    result.append(self.host[:-1] + link['href'])
+                else:
+                    result.append(self.host + link['href'])
             elif '#' not in link['href']:
                 result.append(link['href'])
         return result
 
     @staticmethod
-    def get_host(url: str):
+    def get_host(url: str) -> str:
         parsed_url = urlparse(url)
         return f'{parsed_url.scheme}://{parsed_url.netloc}/'
 
     @staticmethod
-    def get_info(html: str, url: str):
+    def get_info(html: str, url: str) -> Set[str]:
         info = []
         url_info = re.split(r'[\-:./\d]+', url)
         info += url_info
@@ -38,4 +42,6 @@ class Parser(object):
                 info = info + description
             if title is not None:
                 info = info + title.group(1).split()
-        return set(word.strip().lower() for word in info)
+        set_info = set(word.strip().lower() for word in info)
+        set_info.add('')
+        return set_info

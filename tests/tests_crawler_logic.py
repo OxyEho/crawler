@@ -3,8 +3,9 @@ import re
 import requests
 
 from unittest.mock import patch
+from yarl import URL
 
-from crawler.crawler import Crawler
+from crawler.crawler import Crawler, Page
 
 
 class FakeResponse:
@@ -134,6 +135,7 @@ class TestsCrawler(unittest.TestCase):
                                          '<a href=https://scala6.html></a>' \
                                          '<a href=https://scala7.html></a>' \
                                          '<a href=https://scala8.html></a>' \
+                                         '<a href=https://scala9.html></a>' \
                                          '<a href=https://scala9.html></a>'
             with patch.object(Crawler, 'write_html') as mock_write_html:
                 mock_write_html.return_value = None
@@ -145,7 +147,7 @@ class TestsCrawler(unittest.TestCase):
                 test_result = test_crawler.crawl()
                 self.assertEqual(len(test_result), 1)
 
-    def test_fill_disallow_urls(self):
+    def test_fill_disallow_urls_from_robot(self):
         with patch.object(requests, 'get') as mock_get:
             with open('fake_robots.txt', 'r') as fake_robots_txt:
                 mock_get.return_value = FakeResponse()
@@ -156,6 +158,22 @@ class TestsCrawler(unittest.TestCase):
                 test_crawler.fill_disallow_urls('https://a/')
                 self.assertEqual({re.compile('https://a/b.+', re.IGNORECASE)},
                                  test_crawler.disallow_urls)
+
+    def test_update_parents(self):
+        with patch.object(Crawler, 'get_html') as mock_get_html:
+            mock_get_html.return_value = '<a href=a/c/></a>' \
+                                         '<a href=a/b/></a>'
+            with patch.object(Crawler, 'write_html') as mock_write_html:
+                mock_write_html.return_value = None
+            test_crawler = Crawler(
+                'a',
+                [''], {}, max_urls_count=3)
+            test_result = test_crawler.crawl()
+            for page in test_result:
+                if page.parent:
+                    self.assertEqual(page.parent,
+                                     Page(URL('a'),
+                                          test_crawler.directory_for_download))
 
 
 if __name__ == '__main__':
