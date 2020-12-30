@@ -17,7 +17,7 @@ class Page:
         self.parent = None
 
     def __hash__(self):
-        return hash(str(self._link))
+        return hash(str(self.url))
 
     def __eq__(self, other):
         if isinstance(other, Page):
@@ -25,10 +25,6 @@ class Page:
         return False
 
     def __str__(self):
-        return self._link
-
-    @property
-    def _link(self):
         return str(self.url)
 
 

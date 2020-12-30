@@ -8,9 +8,10 @@ from crawler.crawler import Crawler
 def show_graph(pages):
     graph = nx.Graph()
     for page in pages:
-        graph.add_node(page._link)
+        graph.add_node(page.url.host + page.url.path)
         if page.parent is not None:
-            graph.add_edge(page.parent._link, page._link)
+            graph.add_edge(page.url.host + page.parent.url.path,
+                           page.url.host + page.url.path)
     nx.draw(graph,
             node_color='red',
             node_size=1000,
